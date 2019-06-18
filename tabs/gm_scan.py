@@ -42,10 +42,9 @@ class ScanUtil(tk.Frame):
           value=op, bg=u.green_color, command=self.set_status).grid(row=0, column=i, padx=10, pady=10, sticky='W')
     self.fill_inj_frame()
     self.inj_frame.grid(row=1, column=0, columnspan=2, padx=10, pady=10, sticky='W')
-    tk.Button(self.util_frame, text='Check Status', bg=u.green_color, command=self.check_status).grid(row=2, column=0, padx=10, pady=10)
+    tk.Button(self.util_frame, text='Check Values', bg=u.green_color, command=self.check_values).grid(row=2, column=0, padx=10, pady=10)
     tk.Button(self.util_frame, text='Set Values', bg=u.green_color, command=self.set_values).grid(row=2, column=1, padx=10, pady=10)
     self.util_frame.pack(padx=20, pady=20, anchor='w')
-    self.check_status()
     self.check_values()
 
   def fill_inj_frame(self):
@@ -72,58 +71,24 @@ class ScanUtil(tk.Frame):
       return
 
   def check_values(self):
-    packet1 = [u.COMMAND_SCAN, SCAN_GET_DATA, 1, 0, 0, "Check SCN Data Value", "Y"]
-    err_flag, reply1 = u.send_command(u.Crate_INJ, packet1)
+    i = 0;
+    while i < 4:
+      packet = [u.COMMAND_SCAN, SCAN_GET_DATA, i+1, 0, 0, "Check SCN Data Value", "Y"]
+      err_flag, reply = u.send_command(u.Crate_INJ, packet)
     
-    if err_flag == u.SOCK_OK:
-      value1 = int(reply1[3])
-      self.inj_entries[0].delete(0, tk.END)
-      self.inj_entries[0].insert(0, str(value1))
-      print("Value 1 is " + str(value1))
+      if err_flag == u.SOCK_OK:
+        value = int(reply[3])
+        self.inj_entries[i].delete(0, tk.END)
+        self.inj_entries[i].insert(0, str(value))
+        print("Value is " + str(value))
 
-    else:
-      print(" check_status: ERROR, Could not access socket.")
-      return
+      else:
+        print(" check_status: ERROR, Could not access socket.")
+        return
 
-    packet2 = [u.COMMAND_SCAN, SCAN_GET_DATA, 2, 0, 0, "Check SCN Data Value", "Y"]
-    err_flag, reply2 = u.send_command(u.Crate_INJ, packet2)
-    
-    if err_flag == u.SOCK_OK:
-      value2 = int(reply2[3])
-      self.inj_entries[1].delete(0, tk.END)
-      self.inj_entries[1].insert(0, str(value2))
-      print("Value 2 is " + str(value2))
+      i += 1
 
-    else:
-      print(" check_status: ERROR, Could not access socket.")
-      return
-
-    packet3 = [u.COMMAND_SCAN, SCAN_GET_DATA, 3, 0, 0, "Check SCN Data Value", "Y"]
-    err_flag, reply3 = u.send_command(u.Crate_INJ, packet3)
-    
-    if err_flag == u.SOCK_OK:
-      value3 = int(reply3[3])
-      self.inj_entries[2].delete(0, tk.END)
-      self.inj_entries[2].insert(0, str(value3))
-      print("Value 3 is " + str(value3))
-
-    else:
-      print(" check_status: ERROR, Could not access socket.")
-      return
-
-    packet4 = [u.COMMAND_SCAN, SCAN_GET_DATA, 4, 0, 0, "Check SCN Data Value", "Y"]
-    err_flag, reply4 = u.send_command(u.Crate_INJ, packet4)
-    
-    if err_flag == u.SOCK_OK:
-
-      value4 = int(reply4[3])
-      self.inj_entries[3].delete(0, tk.END)
-      self.inj_entries[3].insert(0, str(value4))
-      print("Value 4 is " + str(value4))
-
-    else:
-      print(" check_status: ERROR, Could not access socket.")
-      return
+    self.check_values()
 
   def set_status(self):
     if self.clean_setting.get() == 'CLEAN':
@@ -139,6 +104,9 @@ class ScanUtil(tk.Frame):
       print("SCAN status change call is complete");
     else:
       print(" check_status: ERROR, Could not access socket.")
+
+    self.set_values()
+    self.check_values()
 
   def set_values(self):
 
