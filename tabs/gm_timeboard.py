@@ -116,8 +116,8 @@ class Timeboard(tk.Frame):
 
     self.defaults_frame.grid(row=2, column=0, padx=20, pady=10, columnspan=2)
 
-    self.read_defaults()
-    self.set_all()
+    #self.read_defaults()
+    #self.set_all()
     self.check_all()
 
   def read_defaults(self):
