@@ -89,6 +89,8 @@ class ScanUtil(tk.Frame):
   def start_timer(self):
     self.startTimer = True
     self.timer_labels[0].config(text=self.timer_entries[0].get())
+    self.timer_frame.config(bg=u.green_color)
+    self.timer_labels[0].config(bg='#3C5353')
 
   def timer_loop(self):
     # Make a timing thing: 
