@@ -6,6 +6,7 @@ Code by A.J. Zec
 
 import tkinter as tk
 from tkinter import ttk
+import distutils.util
 import os
 import webbrowser
 
@@ -47,15 +48,34 @@ class GreenMonster:
     def educate_yourself(self, event):
       webbrowser.open_new(r"https://en.wikipedia.org/wiki/Green_Monster")
 
+    def checkHRSflag(self):
+      hrsinfile = open("/adaqfs/home/apar/devices/PyGreenMonster/includeHRS.flags",'r')
+      tmp="False"
+      for line in hrsinfile:
+        print("Include HRSs = " + line)
+        tmp=bool(distutils.util.strtobool(line.strip('\n')))
+        print("Include HRSs = " + str(tmp))
+        return tmp
+
     def expert_tab(self, expt_tab):
         tab_control = ttk.Notebook(expt_tab)
-        tab_titles = [('TimeBoard', tmbd.Timeboard), 
-                      ('VQWK ADCs', vqwk.VQWK), 
-                      #('ADC18s, CH', adc18s.ADC18),
-                      ('ADC18s, RtSpec', adc18s_rtspec.ADC18), 
-                      ('ADC18s, LftSpec',adc18s_lftspec.ADC18),
-                      #('VXWorks Server', vxworks.VXWorks)
-                      ]
+        tab_titles = []
+        if self.checkHRSflag():
+          tab_titles = [('TimeBoard', tmbd.Timeboard), 
+                        ('VQWK ADCs', vqwk.VQWK), 
+                        #('ADC18s, CH', adc18s.ADC18),
+                        # FIXME No HRSs
+                        ('ADC18s, RtSpec', adc18s_rtspec.ADC18), 
+                        ('ADC18s, LftSpec',adc18s_lftspec.ADC18),
+                        #('VXWorks Server', vxworks.VXWorks)
+                        ]
+        else:
+          tab_titles = [('TimeBoard', tmbd.Timeboard), 
+                        ('VQWK ADCs', vqwk.VQWK), 
+                        #('ADC18s, CH', adc18s.ADC18),
+                        # FIXME No HRSs
+                        #('VXWorks Server', vxworks.VXWorks)
+                        ]
         for title, fn in tab_titles:
             sub_tab = ttk.Frame(tab_control, width=800, height=600, style="My.TFrame")
             tab_control.add(sub_tab, text=title)

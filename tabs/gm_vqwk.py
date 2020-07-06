@@ -8,6 +8,7 @@ Code by A.J. Zec
 import tkinter as tk
 from tkinter import ttk
 import utils as u
+import distutils.util
 from ctypes import cdll
 
 GM_VQWK		=7000
@@ -19,6 +20,7 @@ VQWK_SPB	=701
 VQWK_GD		=702
 VQWK_NB		=703
 PATH      ="/adaqfs/home/apar/devices/crl/injector/g0inj.flags"
+HRSFLAG  ="/adaqfs/home/apar/devices/PyGreenMonster/includeHRS.flags"
 
 class VQWK(tk.Frame):
   def __init__(self, tab):
@@ -34,6 +36,7 @@ class VQWK(tk.Frame):
     self.samples_ch_e = tk.Entry(self.ch_frame)
     self.gate_ch_e = tk.Entry(self.ch_frame)
     self.blocks_ch_e = tk.Entry(self.ch_frame)
+    self.includeHRSs = self.checkHRSflag();
     self.fill_ch_frame()
     self.ch_frame.grid(row=0, column=0, padx=20, pady=10)
 
@@ -78,6 +81,15 @@ class VQWK(tk.Frame):
     #self.read_defaults()
     #self.set_all()
     self.check_all()
+
+  def checkHRSflag(self):
+    hrsinfile = open(HRSFLAG,'r')
+    tmp="False"
+    for line in hrsinfile:
+      print("Include HRSs = " + line)
+      tmp=bool(distutils.util.strtobool(line.strip('\n')))
+      print("Include HRSs = " + str(tmp))
+      return tmp
 
   def read_defaults(self):
     global samplesCH
@@ -220,14 +232,18 @@ class VQWK(tk.Frame):
   def check_all(self):
     self.check_values_ch()
     self.check_values_inj()
-    self.check_values_lft_spec()
-    self.check_values_rt_spec()
+    # no HRS
+    if self.includeHRSs:
+      self.check_values_lft_spec()
+      self.check_values_rt_spec()
 
   def set_all(self):
     self.set_values_ch()
     self.set_values_inj()
-    self.set_values_lft_spec()
-    self.set_values_rt_spec()
+    # no HRS
+    if self.includeHRSs:
+      self.set_values_lft_spec()
+      self.set_values_rt_spec()
 
   def fill_ch_frame(self):
     self.samples_ch_l.grid(row=0, column=0, padx=10, pady=5, sticky='W')

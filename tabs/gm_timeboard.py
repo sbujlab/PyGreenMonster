@@ -8,6 +8,7 @@ Code by A.J. Zec
 import tkinter as tk
 from tkinter import ttk
 import utils as u
+import distutils.util
 from ctypes import cdll
 
 GM_HAPTB	=1000
@@ -19,6 +20,7 @@ HAPTB_RD	=201
 HAPTB_IT	=202
 HAPTB_OS	=221
 PATH      ="/adaqfs/home/apar/devices/crl/vqwkTiming.flags"
+HRSFLAG  ="/adaqfs/home/apar/devices/PyGreenMonster/includeHRS.flags"
 
 class Timeboard(tk.Frame):
   def __init__(self, tab):
@@ -34,6 +36,7 @@ class Timeboard(tk.Frame):
     self.ramp_delay_e = tk.Entry(self.ch_frame)
     self.int_time_e = tk.Entry(self.ch_frame)
     self.oversamp_e = tk.Entry(self.ch_frame)
+    self.includeHRSs = self.checkHRSflag();
 
     self.ramp_delay_l.grid(row=0, column=0, padx=10, pady=5, sticky='W')
     self.int_time_l.grid(row=1, column=0, padx=10, pady=5, sticky='W')
@@ -119,6 +122,16 @@ class Timeboard(tk.Frame):
     #self.read_defaults()
     #self.set_all()
     self.check_all()
+
+  def checkHRSflag(self):
+    hrsinfile = open(HRSFLAG,'r')
+    tmp="False"
+    for line in hrsinfile:
+      print("Include HRSs = " + line)
+      tmp=bool(distutils.util.strtobool(line.strip('\n')))
+      print("Include HRSs = " + str(tmp))
+      return tmp
+
 
   def read_defaults(self):
     global delayCH
@@ -219,14 +232,18 @@ class Timeboard(tk.Frame):
   def check_all(self):
     self.check_values_ch()
     self.check_values_inj()
-    self.check_values_lft_spec()
-    self.check_values_rt_spec()
+    # no HRS
+    if self.includeHRSs:
+      self.check_values_lft_spec()
+      self.check_values_rt_spec()
 
   def set_all(self):
     self.set_values_ch()
     self.set_values_inj()
-    self.set_values_lft_spec()
-    self.set_values_rt_spec()
+    #no HRS
+    if self.includeHRSs:
+      self.set_values_lft_spec()
+      self.set_values_rt_spec()
 
   def check_values_ch(self):
     packet1 = [u.COMMAND_HAPTB, HAPTB_GET_DATA, HAPTB_RD, 0, 0, "TB Get Data", "Y"]
