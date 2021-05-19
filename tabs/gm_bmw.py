@@ -40,6 +40,7 @@ class BMW(tk.Frame):
     self.script_frame_layout()
     self.test_frame_layout()
     self.bm_frame.pack(padx=20, pady=20, anchor='w')
+    self.check_status_button()
 
   def script_frame_layout(self):
     self.ks_bm_l.grid(row=0, column=0, padx=10, pady=10, sticky='W')
@@ -100,7 +101,7 @@ class BMW(tk.Frame):
       kill_switch = bool(reply[3])
       print(tab_title + " check_status: kill_switch = " + str(kill_switch))
 
-      if kill_switch: self.ks.bm_l['text'] = 'Kill Switch is ON'
+      if kill_switch: self.ks_bm_l['text'] = 'Kill Switch is ON'
       else: self.ks_bm_l['text'] = 'Kill Switch is OFF'
 
       if bmw_running: 

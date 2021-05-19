@@ -42,7 +42,7 @@ class ADC18(tk.Frame):
       ADClabels.append(self.get_label_adc(i))
       i += 1
 
-    self.ch_frame = tk.LabelFrame(tab, text='CH', background=u.green_color)
+    self.lft_spec_frame = tk.LabelFrame(tab, text='LHRS', background=u.green_color)
     self.adc_ls = []
     self.int_es = []
     self.conv_es = []
@@ -51,16 +51,16 @@ class ADC18(tk.Frame):
 
     i = 0
     while i < numADC:
-      self.adc_ls.append(tk.Label(self.ch_frame, text='ADC '+str(ADClabels[i]), background=u.green_color))
-      self.int_es.append(tk.Entry(self.ch_frame, width=3))
-      self.conv_es.append(tk.Entry(self.ch_frame, width=3))
+      self.adc_ls.append(tk.Label(self.lft_spec_frame, text='ADC '+str(ADClabels[i]), background=u.green_color))
+      self.int_es.append(tk.Entry(self.lft_spec_frame, width=3))
+      self.conv_es.append(tk.Entry(self.lft_spec_frame, width=3))
       self.dac_settings.append(tk.StringVar())
       self.sample_settings.append(tk.IntVar())
       i += 1
       
     labels = ['Label', 'Int', 'Conv', '-----', 'DAC', 'Settings', '-----', 'Sample by:']
     for i, label in enumerate(labels):
-      tk.Label(self.ch_frame, text=label, background=u.green_color).grid(
+      tk.Label(self.lft_spec_frame, text=label, background=u.green_color).grid(
           row=0, column=i, padx=8, pady=10, sticky='W')
     
     self.create_table(numADC)
@@ -68,7 +68,7 @@ class ADC18(tk.Frame):
 
   def get_num_adc(self):
     packet = [u.COMMAND_ADC18, ADC18_GET_NUMADC, 0, 0, 0, "ADC Get Number", "Y"]
-    err_flag, reply = u.send_command(u.Crate_CH, packet)
+    err_flag, reply = u.send_command(u.Crate_LHRS, packet)
 
     if err_flag == u.SOCK_OK:
       return int(reply[3])
@@ -79,7 +79,7 @@ class ADC18(tk.Frame):
 
   def get_label_adc(self, index):
     packet = [u.COMMAND_ADC18, ADC18_GET_LABEL, index, 0, 0, "ADC Get Label", "Y"]
-    err_flag, reply = u.send_command(u.Crate_CH, packet)
+    err_flag, reply = u.send_command(u.Crate_LHRS, packet)
     
     if err_flag == u.SOCK_OK:
       return int(reply[3])
@@ -98,18 +98,18 @@ class ADC18(tk.Frame):
       settings = ['Tri', 'Saw', 'Const', 'Off']
       setting.set('Tri')
       for j,s in enumerate(settings):
-        tk.Radiobutton(self.ch_frame, text=s, variable=setting, value=s, background=u.green_color).grid(
+        tk.Radiobutton(self.lft_spec_frame, text=s, variable=setting, value=s, background=u.green_color).grid(
           row=i, column=j+3, padx=5, pady=10, sticky='W')
       sample_by = self.sample_settings[i-1]
       sample_by.set(1)
-      tk.OptionMenu(self.ch_frame, sample_by, 1, 2, 4, 8).grid(row=i, column=7)
-    tk.Button(self.ch_frame, text='Get Settings', background=u.green_color, command=self.check_values).grid(
+      tk.OptionMenu(self.lft_spec_frame, sample_by, 1, 2, 4, 8).grid(row=i, column=7)
+    tk.Button(self.lft_spec_frame, text='Get Settings', background=u.green_color, command=self.check_values).grid(
         row=6, column=1, columnspan=2, pady=50, sticky='S')
-    tk.Button(self.ch_frame, text='Apply Settings', background=u.green_color, command=self.set_values).grid(
+    tk.Button(self.lft_spec_frame, text='Apply Settings', background=u.green_color, command=self.set_values).grid(
         row=6, column=3, columnspan=2, pady=50, sticky='S')
-    tk.Button(self.ch_frame, text='Cancel', background=u.green_color, command=self.check_values).grid(
+    tk.Button(self.lft_spec_frame, text='Cancel', background=u.green_color, command=self.check_values).grid(
         row=6, column=5, pady=50, sticky='S')
-    self.ch_frame.pack(padx=20, pady=20)
+    self.lft_spec_frame.pack(padx=20, pady=20)
 
   def check_values(self):
     fSample = []
@@ -121,7 +121,7 @@ class ADC18(tk.Frame):
     i = 0
     while i < value:
       packet = [u.COMMAND_ADC18, ADC18_GET_SAMP, i, 0, 0, "ADC18 Get Sample", "Y"]
-      err_flag, reply = u.send_command(u.Crate_CH, packet)
+      err_flag, reply = u.send_command(u.Crate_LHRS, packet)
     
       if err_flag == u.SOCK_OK:
         fSample.append(reply[3])
@@ -132,7 +132,7 @@ class ADC18(tk.Frame):
         return -1
 
       packet = [u.COMMAND_ADC18, ADC18_GET_INT, i, 0, 0, "ADC18 Get Int", "Y"]
-      err_flag, reply = u.send_command(u.Crate_CH, packet)
+      err_flag, reply = u.send_command(u.Crate_LHRS, packet)
     
       if err_flag == u.SOCK_OK:
         fIntGain.append(reply[3])
@@ -144,7 +144,7 @@ class ADC18(tk.Frame):
         return -1
 
       packet = [u.COMMAND_ADC18, ADC18_GET_CONV, i, 0, 0, "ADC18 Get Conv", "Y"]
-      err_flag, reply = u.send_command(u.Crate_CH, packet)
+      err_flag, reply = u.send_command(u.Crate_LHRS, packet)
     
       if err_flag == u.SOCK_OK:
         fConvGain.append(reply[3])
@@ -156,7 +156,7 @@ class ADC18(tk.Frame):
         return -1
 
       packet = [u.COMMAND_ADC18, ADC18_GET_DAC, i, 0, 0, "ADC18 Get DAC", "Y"]
-      err_flag, reply = u.send_command(u.Crate_CH, packet)
+      err_flag, reply = u.send_command(u.Crate_LHRS, packet)
     
       if err_flag == u.SOCK_OK:
         fDAC.append(reply[3])
@@ -189,7 +189,7 @@ class ADC18(tk.Frame):
         print("ERROR: Int Value is out of range! Try (0-3)...")
       else:
         packet = [u.COMMAND_ADC18, ADC18_SET_INT, i, fIntGain[i], 0, "ADC18 Set Int", "Y"]
-        err_flag, reply = u.send_command(u.Crate_CH, packet)
+        err_flag, reply = u.send_command(u.Crate_LHRS, packet)
       
         if err_flag == u.SOCK_OK:
           pass
@@ -203,7 +203,7 @@ class ADC18(tk.Frame):
         print("ERROR: Conv Value is out of range! Try (0-15)...")
       else:
         packet = [u.COMMAND_ADC18, ADC18_SET_CONV, i, fConvGain[i], 0, "ADC18 Set Conv", "Y"]
-        err_flag, reply = u.send_command(u.Crate_CH, packet)
+        err_flag, reply = u.send_command(u.Crate_LHRS, packet)
        
         if err_flag == u.SOCK_OK:
           pass
@@ -223,7 +223,7 @@ class ADC18(tk.Frame):
         dacflag = DACOFF18
 
       packet = [u.COMMAND_ADC18, ADC18_SET_DAC, i, dacflag, 0, "ADC18 Set DAC", "Y"]
-      err_flag, reply = u.send_command(u.Crate_CH, packet)
+      err_flag, reply = u.send_command(u.Crate_LHRS, packet)
        
       if err_flag == u.SOCK_OK:
         pass
@@ -234,7 +234,7 @@ class ADC18(tk.Frame):
       fSample.append(int(self.sample_settings[i].get()))
 
       packet = [u.COMMAND_ADC18, ADC18_SET_SAMP, i, fSample[i], 0, "ADC18 Set Sample", "Y"]
-      err_flag, reply = u.send_command(u.Crate_CH, packet)
+      err_flag, reply = u.send_command(u.Crate_LHRS, packet)
       
       if err_flag == u.SOCK_OK:
         pass

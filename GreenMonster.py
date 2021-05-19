@@ -6,6 +6,7 @@ Code by A.J. Zec
 
 import tkinter as tk
 from tkinter import ttk
+import distutils.util
 import os
 import webbrowser
 
@@ -13,8 +14,10 @@ import tabs.gm_bmw as bmw
 import tabs.gm_scan as scan_util
 import tabs.gm_timeboard as tmbd
 import tabs.gm_vqwk as vqwk
-import tabs.gm_adc18 as adc18s
-import tabs.gm_vxworks as vxworks
+#import tabs.gm_adc18 as adc18s
+import tabs.gm_adc18_rtspec as adc18s_rtspec
+import tabs.gm_adc18_lftspec as adc18s_lftspec
+#import tabs.gm_vxworks as vxworks
 import utils as u
 
 class GreenMonster:
@@ -45,12 +48,34 @@ class GreenMonster:
     def educate_yourself(self, event):
       webbrowser.open_new(r"https://en.wikipedia.org/wiki/Green_Monster")
 
+    def checkHRSflag(self):
+      hrsinfile = open("/adaqfs/home/apar/devices/PyGreenMonster/includeHRS.flags",'r')
+      tmp="False"
+      for line in hrsinfile:
+        print("Include HRSs = " + line)
+        tmp=bool(distutils.util.strtobool(line.strip('\n')))
+        print("Include HRSs = " + str(tmp))
+        return tmp
+
     def expert_tab(self, expt_tab):
         tab_control = ttk.Notebook(expt_tab)
-        tab_titles = [('TimeBoard', tmbd.Timeboard), 
-                      ('VQWK ADCs', vqwk.VQWK), 
-                      ('ADC18s, CH', adc18s.ADC18), 
-                      ('VXWorks Server', vxworks.VXWorks)]
+        tab_titles = []
+        if self.checkHRSflag():
+          tab_titles = [('TimeBoard', tmbd.Timeboard), 
+                        ('VQWK ADCs', vqwk.VQWK), 
+                        #('ADC18s, CH', adc18s.ADC18),
+                        # FIXME No HRSs
+                        ('ADC18s, RtSpec', adc18s_rtspec.ADC18), 
+                        ('ADC18s, LftSpec',adc18s_lftspec.ADC18),
+                        #('VXWorks Server', vxworks.VXWorks)
+                        ]
+        else:
+          tab_titles = [('TimeBoard', tmbd.Timeboard), 
+                        ('VQWK ADCs', vqwk.VQWK), 
+                        #('ADC18s, CH', adc18s.ADC18),
+                        # FIXME No HRSs
+                        #('VXWorks Server', vxworks.VXWorks)
+                        ]
         for title, fn in tab_titles:
             sub_tab = ttk.Frame(tab_control, width=800, height=600, style="My.TFrame")
             tab_control.add(sub_tab, text=title)
@@ -69,7 +94,10 @@ class GreenMonster:
         for title, fn in tab_titles:
             tab = ttk.Frame(tab_control, width=800, height=600, style="My.TFrame")
             tab_control.add(tab, text=title)
-            fn(tab)
+            if "ScanUtil" in title:
+              fn(tab,self)
+            else:
+              fn(tab)
         tab_control.grid(row=0, column=0, columnspan=2)
         fenway = tk.PhotoImage(file='gm.ppm')
         fenway_pahk = tk.Label(self.win, image=fenway, cursor="hand2", bg=u.green_color)
